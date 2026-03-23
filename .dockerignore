@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.*
+.env.local
+.env.development
+.env.production
+.git
+.gitignore
+*.md
+src/__tests__
+vitest.config.ts
+.vscode
+.idea
