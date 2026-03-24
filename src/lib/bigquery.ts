@@ -74,8 +74,8 @@ export async function createSession(data: {
 
   const client = getClient();
   const query = `
-    INSERT INTO \`${DATASET}.sessions\`
-      (session_id, user_id, stage, collected_data, created_at, updated_at)
+    INSERT INTO \`${DATASET}.chat_sessions\`
+      (id, user_id, current_stage, collected_data, created_at, updated_at)
     VALUES
       (@sessionId, @userId, @stage, @collectedData, CURRENT_TIMESTAMP(), CURRENT_TIMESTAMP())
   `;
@@ -106,13 +106,13 @@ export async function updateSession(
 
   const client = getClient();
   const query = `
-    UPDATE \`${DATASET}.sessions\`
+    UPDATE \`${DATASET}.chat_sessions\`
     SET
-      stage = @stage,
+      current_stage = @stage,
       collected_data = @collectedData,
       eligibility_result = @eligibilityResult,
       updated_at = CURRENT_TIMESTAMP()
-    WHERE session_id = @sessionId
+    WHERE id = @sessionId
   `;
 
   await client.query({
@@ -135,9 +135,9 @@ export async function getSession(sessionId: string): Promise<SessionRow | null> 
 
   const client = getClient();
   const query = `
-    SELECT session_id, user_id, stage, collected_data, eligibility_result, created_at, updated_at
-    FROM \`${DATASET}.sessions\`
-    WHERE session_id = @sessionId
+    SELECT id, user_id, current_stage, collected_data, eligibility_result, created_at, updated_at
+    FROM \`${DATASET}.chat_sessions\`
+    WHERE id = @sessionId
     LIMIT 1
   `;
 
@@ -150,9 +150,9 @@ export async function getSession(sessionId: string): Promise<SessionRow | null> 
 
   const row = rows[0] as Record<string, unknown>;
   return {
-    session_id: String(row.session_id),
+    session_id: String(row.id),
     user_id: String(row.user_id),
-    stage: String(row.stage) as ConversationStage,
+    stage: String(row.current_stage) as ConversationStage,
     collected_data: String(row.collected_data),
     eligibility_result: row.eligibility_result ? String(row.eligibility_result) : null,
     created_at: String(row.created_at),

@@ -58,8 +58,16 @@ export async function POST(request: Request): Promise<Response> {
   const encoder = new TextEncoder();
   const stream = new ReadableStream({
     async start(controller) {
+      let closed = false;
       function send(event: string, data: unknown): void {
+        if (closed) return;
         controller.enqueue(encoder.encode(sseEncode(event, data)));
+      }
+      function closeOnce(): void {
+        if (!closed) {
+          closed = true;
+          controller.close();
+        }
       }
 
       try {
@@ -82,14 +90,14 @@ export async function POST(request: Request): Promise<Response> {
             },
             onError(error: Error) {
               send('error', { message: error.message });
-              controller.close();
+              closeOnce();
             },
           }
         );
 
         if (!fullResponse) {
           send('done', { finished: true });
-          controller.close();
+          closeOnce();
           return;
         }
 
@@ -158,12 +166,12 @@ export async function POST(request: Request): Promise<Response> {
         }
 
         send('done', { finished: true });
-        controller.close();
+        closeOnce();
       } catch (err: unknown) {
         const errorMessage =
           err instanceof Error ? err.message : 'An unexpected error occurred';
         send('error', { message: errorMessage });
-        controller.close();
+        closeOnce();
       }
     },
   });
