@@ -53,7 +53,7 @@ steps:
       - "3000"
       - "--allow-unauthenticated"
       - "--set-secrets"
-      - "GEMINI_API_KEY=GEMINI_API_KEY:latest,GCP_PROJECT_ID=GCP_PROJECT_ID:latest"
+      - "GEMINI_API_KEY=GOOGLE_API_KEY:latest,GCP_PROJECT_ID=GCP_PROJECT_ID:latest"
 
 images:
   - "${_REGION}-docker.pkg.dev/$PROJECT_ID/${_REPOSITORY}/${_IMAGE_NAME}:${SHORT_SHA}"
